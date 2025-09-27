@@ -6,7 +6,7 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>PS2 Game Selector</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script>
+
 function filterGames() {
   const searchValue = document.getElementById('searchBox').value.toLowerCase();
   const categoryValue = document.getElementById('categoryFilter').value;
@@ -102,8 +102,11 @@ function filterGames() {
 <button onclick="sendWhatsApp()">WhatsApp</button>
 </div>
 </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 <script>
-  const games = [
+const games = [
    { name: "007 Everything or Nothing.iso", size: 3.25, category: "Unknown", sizeGroup: "3-4GB", gameID: "" },
   { name: "007 NightFire Platinum.iso", size: 3.73, category: "Unknown", sizeGroup: "3-4GB", gameID: "" },
   { name: "187 Ride or Die Europe Australia.iso", size: 2.49, category: "Unknown", sizeGroup: "2-3GB", gameID: "" },
@@ -1063,14 +1066,12 @@ function updateStorageBar() {
     `Used: ${selectedSize.toFixed(2)} GB of ${totalSize} GB (${usedPercent.toFixed(0)}%)`;
 }
 
-</script>
-<script>
 window.addEventListener('click', () => {
   const music = document.getElementById('bgMusic');
   music.muted = false;
   music.play();
 }, { once: true });
-</script><script>
+
 function generateExportText() {
   const name = document.getElementById("customerName").value.trim();
   const mobile = document.getElementById("customerMobile").value.trim();
@@ -1115,8 +1116,7 @@ function sendEmail() {
   const mailto = `mailto:${email}?subject=` + encodeURIComponent(subject) + "&body=" + encodeURIComponent(message);
   window.open(mailto, "_blank");
 }
-</script></body>
-<script>
+
 const selectedGames = [];
 const games = [
   { name: "007 Everything or Nothing.iso", size: 3.25 },
@@ -3084,6 +3084,7 @@ function sendEmail() {
   const mailto = `mailto:${email}?subject=` + encodeURIComponent(subject) + "&body=" + encodeURIComponent(message);
   window.open(mailto, "_blank");
 }
-
 </script>
+</body>
+
 </html>
