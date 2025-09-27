@@ -57,6 +57,144 @@ function filterGames() {
   </style>
 </head>
 <body>
+<!-- START: Storage selector UI (added by assistant) -->
+<div id="storage-selector" style="margin:20px 0; padding:12px; border:1px solid #ddd; border-radius:8px; max-width:420px; font-family:Arial, sans-serif;">
+  <label style="display:block; margin-bottom:8px; font-weight:600;">Select game storage</label>
+  <select id="storageDropdown" style="width:100%; padding:8px; font-size:14px;">
+    <option value="64" data-usable="57">64 GB (57 GB)</option>
+    <option value="128" data-usable="114">128 GB (114 GB)</option>
+    <option value="256" data-usable="238">256 GB (238 GB)</option>
+    <option value="500" data-usable="465">500 GB (465 GB)</option>
+    <option value="1000" data-usable="930">1 TB (930 GB)</option>
+    <option value="custom" data-usable="">Custom...</option>
+  </select>
+
+  <div id="customArea" style="display:none; margin-top:10px;">
+    <label style="display:block; margin-bottom:6px;">Enter custom size (GB)</label>
+    <input id="customInput" type="number" min="1" step="1" style="width:100%; padding:8px; font-size:14px;" placeholder="e.g. 64">
+    <div style="margin-top:8px; font-size:13px; color:#333;">
+      Estimated usable: <span id="estimatedUsable">-</span> GB
+    </div>
+  </div>
+
+  <div style="margin-top:12px; display:flex; gap:8px;">
+    <button id="setStorageBtn" style="padding:8px 12px; font-size:14px; cursor:pointer;">Set</button>
+    <button id="downloadTxtBtn" style="padding:8px 12px; font-size:14px; cursor:pointer;">Save to .txt</button>
+  </div>
+
+  <div style="margin-top:10px; font-size:13px; color:#006600;" id="storageMessage"></div>
+</div>
+
+<script>
+(function(){
+  const dropdown = document.getElementById('storageDropdown');
+  const customArea = document.getElementById('customArea');
+  const customInput = document.getElementById('customInput');
+  const estimatedUsable = document.getElementById('estimatedUsable');
+  const setBtn = document.getElementById('setStorageBtn');
+  const downloadBtn = document.getElementById('downloadTxtBtn');
+  const msg = document.getElementById('storageMessage');
+
+  // mapping exactly as requested
+  const mapping = {
+    "64": 57,
+    "128": 114,
+    "256": 238,
+    "500": 465,
+    "1000": 930
+  };
+
+  // default: select 64 (which shows 57 GB)
+  dropdown.value = "64";
+
+  function updateCustomVisibility(){
+    if(dropdown.value === 'custom'){
+      customArea.style.display = 'block';
+      estimateFromCustom();
+    } else {
+      customArea.style.display = 'none';
+      estimatedUsable.textContent = mapping[dropdown.value] || '-';
+    }
+  }
+
+  function estimateFromCustom(){
+    const v = parseFloat(customInput.value);
+    if(!v || v <= 0){
+      estimatedUsable.textContent = '-';
+      return;
+    }
+    // Estimate usable for custom:
+    // We'll use a heuristic: if capacity >= 256 use 0.93 factor, else use 0.890625 factor (to match examples)
+    let factor = v >= 256 ? 0.93 : 0.890625;
+    const usable = Math.round(v * factor);
+    estimatedUsable.textContent = usable;
+  }
+
+  dropdown.addEventListener('change', updateCustomVisibility);
+  customInput.addEventListener('input', estimateFromCustom);
+
+  setBtn.addEventListener('click', function(){
+    let selected = dropdown.value;
+    let usable = '';
+    if(selected === 'custom'){
+      const v = parseFloat(customInput.value);
+      if(!v || v <= 0){
+        msg.textContent = 'Please enter a valid custom size in GB.';
+        msg.style.color = '#aa0000';
+        return;
+      }
+      let factor = v >= 256 ? 0.93 : 0.890625;
+      usable = Math.round(v * factor);
+      msg.style.color = '#006600';
+      msg.textContent = 'Selected: ' + v + ' GB (' + usable + ' GB usable)';
+      // save to window.selectedStorage for later use if needed
+      window.selectedStorage = {capacityGB: v, usableGB: usable};
+    } else {
+      usable = mapping[selected] || '';
+      msg.style.color = '#006600';
+      msg.textContent = 'Selected: ' + (selected === '1000' ? '1 TB' : selected + ' GB') + ' (' + usable + ' GB usable)';
+      window.selectedStorage = {capacityGB: Number(selected), usableGB: usable};
+    }
+  });
+
+  downloadBtn.addEventListener('click', function(){
+    // Prepare content
+    let content = '';
+    if(window.selectedStorage){
+      content = 'Selected storage: ' + window.selectedStorage.capacityGB + ' GB\\nUsable space: ' + window.selectedStorage.usableGB + ' GB\\n';
+    } else {
+      // fallback to current selection
+      if(dropdown.value === 'custom'){
+        const v = parseFloat(customInput.value) || 0;
+        const factor = v >= 256 ? 0.93 : 0.890625;
+        const usable = Math.round(v * factor);
+        content = 'Selected storage: ' + v + ' GB\\nUsable space: ' + usable + ' GB\\n';
+      } else {
+        const sel = dropdown.value;
+        const usable = mapping[sel] || '-';
+        content = 'Selected storage: ' + (sel === '1000' ? '1 TB' : sel + ' GB') + '\\nUsable space: ' + usable + ' GB\\n';
+      }
+    }
+
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'selected_storage.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+
+  // initialize UI
+  updateCustomVisibility();
+  // prefill message to show default
+  setBtn.click();
+})();
+</script>
+<!-- END: Storage selector UI -->
+
 <audio autoplay="" id="bgMusic" loop="" muted="">
 <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_19b5747b58.mp3?filename=future-tech-ambient-11150.mp3" type="audio/mpeg"/>
 </audio>
@@ -871,6 +1009,7 @@ function filterGames() {
   { name: "Zone of the Enders.iso", size: 1.79, category: "Unknown", sizeGroup: "Unknown", gameID: "" }
 ];
 
+
   let selectedGames = [];
 
   function renderGames() {
@@ -1113,7 +1252,105 @@ function sendEmail() {
   const mailto = `mailto:${email}?subject=` + encodeURIComponent(subject) + "&body=" + encodeURIComponent(message);
   window.open(mailto, "_blank");
 }
-</script></body>
+</script>
+<!-- STORAGE SELECTOR: Added by assistant -->
+<div id="storage-selector" style="margin:12px 0; padding:10px; border:1px solid #ddd; border-radius:8px; max-width:420px;">
+  <label for="storage-dropdown" style="display:block; font-weight:600; margin-bottom:6px;">Select Game Storage</label>
+  <select id="storage-dropdown" style="width:100%; padding:8px; font-size:14px; border-radius:6px; border:1px solid #ccc;">
+    <option value="64">64GB (57GB)</option>
+    <option value="128">128GB (114GB)</option>
+    <option value="256">256GB (238GB)</option>
+    <option value="500">500GB (465GB)</option>
+    <option value="1000">1TB (930GB)</option>
+    <option value="custom">Custom size...</option>
+  </select>
+
+  <div id="custom-storage-row" style="margin-top:8px; display:none;">
+    <input id="custom-storage-input" placeholder="Type custom size (e.g. 64, 128, 1TB, 0.5TB)" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc; font-size:14px;">
+  </div>
+
+  <div id="storage-result" style="margin-top:10px; font-size:14px;">
+    Available: <strong id="storage-display">57 GB</strong>
+  </div>
+
+  <!-- hidden input to integrate with existing forms -->
+  <input type="hidden" id="storage-hidden" name="storage_available_gb" value="57">
+</div>
+
+<script>
+(function(){
+  const mapping = {64:57,128:114,256:238,500:465,1000:930};
+  const dropdown = document.getElementById('storage-dropdown');
+  const customRow = document.getElementById('custom-storage-row');
+  const customInput = document.getElementById('custom-storage-input');
+  const display = document.getElementById('storage-display');
+  const hidden = document.getElementById('storage-hidden');
+
+  function formatGB(n){
+    if (Number.isFinite(n)) return Math.round(n*100)/100 + ' GB';
+    return n + ' GB';
+  }
+
+  function parseSizeString(s){
+    if (!s) return null;
+    s = String(s).trim().toUpperCase();
+    if (s.endsWith('TB')){
+      const num = parseFloat(s.replace('TB',''));
+      if (!isNaN(num)) return num*1000;
+    }
+    if (s.endsWith('GB')){
+      const num = parseFloat(s.replace('GB',''));
+      if (!isNaN(num)) return num;
+    }
+    const num = parseFloat(s);
+    if (!isNaN(num)) return num;
+    return null;
+  }
+
+  function computeUsable(nominal){
+    if (mapping[nominal]) return mapping[nominal];
+    if (nominal >= 500) return Math.round(nominal * 0.93);
+    return Math.round(nominal * 0.890625);
+  }
+
+  function updateFromValue(val){
+    const usable = computeUsable(val);
+    display.textContent = formatGB(usable);
+    hidden.value = usable;
+  }
+
+  dropdown.addEventListener('change', function(){
+    if (this.value === 'custom'){
+      customRow.style.display = 'block';
+      customInput.focus();
+      display.textContent = '—';
+      hidden.value = '';
+    } else {
+      customRow.style.display = 'none';
+      const nominal = parseInt(this.value,10);
+      updateFromValue(nominal);
+    }
+  });
+
+  customInput.addEventListener('input', function(){
+    const parsed = parseSizeString(this.value);
+    if (parsed === null){
+      display.textContent = 'Invalid';
+      hidden.value = '';
+      return;
+    }
+    const usable = computeUsable(parsed);
+    display.textContent = formatGB(usable);
+    hidden.value = usable;
+  });
+
+  dropdown.value = '64';
+  updateFromValue(64);
+})();
+</script>
+<!-- END STORAGE SELECTOR -->
+
+</body>
 <script>
 const selectedGames = [];
 const games = [
@@ -1883,6 +2120,7 @@ const games = [
   { name: "Zone of the Enders The 2nd Runner.iso", size: 2.8, category: "Unknown", sizeGroup: "Unknown", gameID: "" },
   { name: "Zone of the Enders.iso", size: 1.79, category: "Unknown", sizeGroup: "Unknown", gameID: "" }
 ];
+
 
 // Newly merged functions
 function guessCategory(name) {
@@ -2839,6 +3077,7 @@ window.onload = () => renderGames(games);
   { name: "Zone of the Enders The 2nd Runner.iso", size: 2.8, category: "Unknown", sizeGroup: "Unknown", gameID: "" },
   { name: "Zone of the Enders.iso", size: 1.79, category: "Unknown", sizeGroup: "Unknown", gameID: "" }
 ];
+
 
   let selectedGames = [];
 
