@@ -5,8 +5,8 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>PS2 Game Selector</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
 function filterGames() {
   const searchValue = document.getElementById('searchBox').value.toLowerCase();
   const categoryValue = document.getElementById('categoryFilter').value;
@@ -103,9 +103,8 @@ function filterGames() {
 </div>
 </div>
 <script>
-  
   const games = [
-    { name: "007 Everything or Nothing.iso", size: 3.25, category: "Unknown", sizeGroup: "3-4GB", gameID: "" },
+   { name: "007 Everything or Nothing.iso", size: 3.25, category: "Unknown", sizeGroup: "3-4GB", gameID: "" },
   { name: "007 NightFire Platinum.iso", size: 3.73, category: "Unknown", sizeGroup: "3-4GB", gameID: "" },
   { name: "187 Ride or Die Europe Australia.iso", size: 2.49, category: "Unknown", sizeGroup: "2-3GB", gameID: "" },
   { name: "2004 Classics Hitlist.iso", size: 4.11, category: "Unknown", sizeGroup: "4-5GB", gameID: "" },
@@ -873,7 +872,7 @@ function filterGames() {
   { name: "Zathura.iso", size: 2.72, category: "Unknown", sizeGroup: "2-3GB", gameID: "" },
   { name: "Zone of the Enders The 2nd Runner.iso", size: 2.8, category: "Unknown", sizeGroup: "2-3GB", gameID: "" },
   { name: "Zone of the Enders.iso", size: 1.79, category: "Unknown", sizeGroup: "1-2GB", gameID: "" },
-]; 
+];
   
   let selectedGames = [];
 
@@ -1055,7 +1054,6 @@ updateSummary = function() {
   label.innerText = `Used: ${selectedSize} GB of ${storage} GB`;
 };
 
-
 function updateStorageBar() {
   const selectedSize = selectedGames.reduce((sum, i) => sum + games[i].size, 0);
   const totalSize = parseFloat(document.getElementById("storageSize").value || "0");
@@ -1119,7 +1117,6 @@ function sendEmail() {
 }
 </script></body>
 <script>
-
 const selectedGames = [];
 const games = [
   { name: "007 Everything or Nothing.iso", size: 3.25 },
@@ -1890,7 +1887,7 @@ const games = [
   { name: "Zathura.iso", size: 2.72 },
   { name: "Zone of the Enders The 2nd Runner.iso", size: 2.8 },
   { name: "Zone of the Enders.iso", size: 1.79 },
-]; 
+];
 
 // Newly merged functions
 function guessCategory(name) {
@@ -2050,7 +2047,6 @@ function updateStorageBar() {
     `Used: ${selectedSize.toFixed(2)} GB of ${totalSize} GB (${usedPercent.toFixed(0)}%)`;
 }
 
-
         function filterBySizeGroup(group) {
           document.querySelectorAll(".game-item").forEach(item => {
             const sizeGroup = item.dataset.sizeGroup;
@@ -2074,7 +2070,6 @@ function clearFilters() {
   document.getElementById("categoryFilter").value = "";
   applyFilters();
 }
-
 
 window.onload = () => renderGames(games);
         
@@ -2848,7 +2843,7 @@ window.onload = () => renderGames(games);
   { name: "Zathura.iso", size: 2.72, category: "Unknown", sizeGroup: "2-3GB", gameID: "" },
   { name: "Zone of the Enders The 2nd Runner.iso", size: 2.8, category: "Unknown", sizeGroup: "2-3GB", gameID: "" },
   { name: "Zone of the Enders.iso", size: 1.79, category: "Unknown", sizeGroup: "1-2GB", gameID: "" },
-]; 
+];
 
   let selectedGames = [];
 
@@ -3030,7 +3025,6 @@ updateSummary = function() {
   label.innerText = `Used: ${selectedSize} GB of ${storage} GB`;
 };
 
-
 function updateStorageBar() {
   const selectedSize = selectedGames.reduce((sum, i) => sum + games[i].size, 0);
   const totalSize = parseFloat(document.getElementById("storageSize").value || "0");
@@ -3040,14 +3034,11 @@ function updateStorageBar() {
     `Used: ${selectedSize.toFixed(2)} GB of ${totalSize} GB (${usedPercent.toFixed(0)}%)`;
 }
 
-
-
 window.addEventListener('click', () => {
   const music = document.getElementById('bgMusic');
   music.muted = false;
   music.play();
 }, { once: true });
-
 
 function generateExportText() {
   const name = document.getElementById("customerName").value.trim();
